@@ -15,15 +15,20 @@ class Grid(object):
 
 class PoissonDisc(object):
     
-    def __init__(self, radius, num_points_to_generate, grid_width, grid_height):
+    def __init__(self, radius, num_points_to_generate, grid_width, grid_height, start_point=None):
         self.radius = radius
         self.n = num_points_to_generate
         self.size = radius / sqrt(self.n)
+        self.start_point = start_point
 
         self.grid = Grid(grid_width, grid_height)
 
     def generate(self):
-        x0, y0 = self._random_point()
+        if self.start_point is None:
+            x0, y0 = self._random_point()
+            self.start_point = (x0, y0)
+        else:
+            x0, y0 = self.start_point
 
         active = [(x0, y0)]
         self._add_point(x0, y0)
@@ -91,13 +96,17 @@ def draw_points(points):
 
 if __name__ == '__main__':
     WIDTH = 200
-    disc = PoissonDisc(8, 16, WIDTH, WIDTH) 
+    disc = PoissonDisc(8, 16, WIDTH, WIDTH, start_point=(WIDTH/2, WIDTH/2)) 
     surface = setup_screen(WIDTH)
     
     points = disc.generate()
     print(points)
     draw_points(points)
+    pygame.display.flip()
     
-    while 1:
-        pygame.display.flip()
+    while True:
+       for event in pygame.event.get():
+           if event.type == pygame.QUIT:
+               break
+    pygame.quit()
 
